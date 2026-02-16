@@ -6,9 +6,6 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import time
 
-# -------------------------------
-# Load model
-# -------------------------------
 model_dict = pickle.load(open('./model.p', 'rb'))
 model = model_dict['model']
 
@@ -22,9 +19,6 @@ MODEL_PATH = 'hand_landmarker.task'
 base_options = python.BaseOptions(model_asset_path=MODEL_PATH)
 labels_dict = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E'}
 
-# -------------------------------
-# Global frame storage
-# -------------------------------
 latest_frame = None
 
 def extract_hand_landmarks(hand_landmarks):
@@ -37,9 +31,7 @@ def extract_hand_landmarks(hand_landmarks):
         data_aux.append(lm.y - y_min)
     return data_aux, x_coords, y_coords
 
-# -------------------------------
-# Callback: update global frame
-# -------------------------------
+
 def results_callback(result, input_image, timestamp_ms):
     global latest_frame
     frame = input_image.numpy_view()  # RGB
@@ -67,27 +59,21 @@ def results_callback(result, input_image, timestamp_ms):
             prediction = model.predict([np.array(data_aux)])
             predicted_character = labels_dict[int(prediction[0])]
 
-            cv2.rectangle(frame_bgr, (x1, y1), (x2, y2), (0, 0, 0), 4)
+          #  cv2.rectangle(frame_bgr, (x1, y1), (x2, y2), (0, 0, 0), 4)
             cv2.putText(frame_bgr, predicted_character, (x1, y1 - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 0, 0), 3, cv2.LINE_AA)
 
-    latest_frame = frame_bgr  # store for main thread display
+    latest_frame = frame_bgr  
 
-# -------------------------------
-# Create detector
-# -------------------------------
 options = vision.HandLandmarkerOptions(
     base_options=base_options,
-    num_hands=2,
+    num_hands=1,
     running_mode=vision.RunningMode.LIVE_STREAM,
     result_callback=results_callback
 )
 detector = vision.HandLandmarker.create_from_options(options)
 start_time = time.time()
 
-# -------------------------------
-# Main loop: send frames & display
-# -------------------------------
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -99,7 +85,6 @@ while True:
 
     detector.detect_async(mp_image, timestamp_ms)
 
-    # Thread-safe display
     if latest_frame is not None:
         cv2.imshow('Hand Prediction', latest_frame)
 
