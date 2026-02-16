@@ -19,21 +19,21 @@ for j in range(num_classes):
     
     while True:
         ret, frame = cap.read()
-        cv2.putText(frame, 'Press Q when ready', (100, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 255, 0), 1, cv2.LINE_AA)
+        cv2.putText(frame, 'Press Q when ready!', (80, 80), cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 255, 0), 3, cv2.LINE_AA)
         cv2.imshow('frame', frame)
         
         if cv2.waitKey(25) & 0xFF == ord('q'):
             break
         
-        counter = 0
+    counter = 0
         
-        while counter < dataset_size:
-            ret, frame = cap.read()
-            cv2.imshow('frame', frame)
-            cv2.waitKey(25)
-            cv2.imwrite(os.path.join(DATA_DIR, str(j), '{}.jpg'.format(counter)), frame)
+    while counter < dataset_size:
+         ret, frame = cap.read()
+         cv2.imshow('frame', frame)
+         cv2.waitKey(25)
+         cv2.imwrite(os.path.join(DATA_DIR, str(j), '{}.jpg'.format(counter)), frame)
             
-            counter += 1
+         counter += 1
             
 cap.release()
 cv2.destroyAllWindows()
